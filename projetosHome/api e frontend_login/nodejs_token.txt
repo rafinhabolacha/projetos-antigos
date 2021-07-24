@@ -1,0 +1,118 @@
+const express = require('express');
+const app = express();
+const jwt = require('jsonwebtoken');
+const cors = require('cors');
+const {promisify}= require('util');
+
+app.use(express.json());
+//midle sera executado primeiro
+app.use((req,res,next)=>{
+  res.header("Access-Control-Allow-Origin","*")
+  res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
+  res.header("Access-Control-Allow-Headers","X-PINGOTHER, Content-Type, Authorization");
+  app.use(cors());
+  next();
+})
+app.get('/',function(req,res){
+ return  res.json({
+       Erro: false,
+       messagem:'pagina inicial!'
+   });
+
+})
+
+//antes de entra em usuarios vai ativar a function validartoken
+app.get('/usuarios',validartoken, function(req,res){
+  return  res.json({
+        Erro: false,
+        messagem:'Lista usuarios'
+    });
+ 
+ })
+//utilize o postman
+app.post('/login',function(req,res){
+  //console.log(req.body);
+ 
+ 
+  if(req.body.usuarios === "rafamergulha@hotmail.com" && req.body.senha==="1234")
+   {
+     const { id } =1;
+     var privatekey="e81d9b3c3c57393453c8";
+     var token = jwt.sign({id},privatekey,{
+       //expiresIn:600 //10min
+       expiresIn:'7d'
+     })
+   return res.json({
+      Erro: false,
+      messagem:'seja bem vindo!',
+      dados: req.body,
+      token:token
+     //token
+     });
+    }
+  else
+   {
+  return res.json({
+      Erro: true,
+      messagem:'Senha ou usuario esta invalida!',
+     });
+   }
+
+
+
+   
+
+
+ // res.json({
+   //   Erro: false,
+  //    messagem:'pagina de login!',
+  //    dados: req.body
+ /// });
+
+})
+//verificar se o token é valido
+async function validartoken(req,res,next){
+//  return res.json({ messagem:'Validar token !'})
+//entra no postman vá em (autorization) depois (barear token)  onde esta token cole o (token)  que esta no (POST) 
+const autorizacao = req.headers.authorization
+//separa o barier do token
+const [, token] = autorizacao.split(' ');
+
+if(!token){
+   return res.json({
+        error:true,
+        messagem:'Error : token não encontrado!'
+       })
+}
+//aqui só o token
+//return res.json({token })
+
+try{
+  //validando o token
+  const decode = await promisify(jwt.verify)(token,privatekey);
+  req.userId = decode.id;
+  return next();
+
+}catch(err){
+
+  return res.json({
+    error:true,
+    messagem:'Error : token invalido!'
+   })
+
+}
+
+
+
+//return next();
+//return res.json({ autorizacao })//aqui teem dois item [barier,token]
+
+//token gerado
+/*eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2MjMzNTMyOTksImV4cCI6MTYyMzM1Mzg5OX0.2JQpY0NLNJgK7ViWkuPwlSDVA3q2o0PX6O_wwDplu4o */
+}
+
+
+app.listen(3333,function(){
+  console.log('servidor rodando !');
+})
+
