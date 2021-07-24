@@ -1,0 +1,24 @@
+//antes de usar rodas mude  pra <Fragment>
+// <React.Fragment><App /></React.Fragment> 
+import React, {} from 'react';
+import {BrowserRouter as Router,Switch,Route} from "react-router-dom";
+import {Home} from './pages/Home';
+import {Cadastrar} from './pages/Cadastrar';
+import {Detalhes} from './pages/Visualizar';
+import {Editar} from './pages/Editar';
+const App = ()=> {
+  return (
+    <div>
+     <Router>
+       <Switch>
+          <Route exact path="/" component={Home} />
+          <Route path="/cadastrar" component={Cadastrar} />
+          <Route path="/visualizar/:id" component={Detalhes} />
+          <Route path="/editar/:id" component={Editar} />
+       </Switch>
+     </Router>
+  </div>
+  );
+}
+
+export default App;
